@@ -1,0 +1,63 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1>רשימת דרישות תשלום</h1>
+      <p *ngIf="currentRole === 'consultant'; else employeeText">
+        כאן ניתן לצפות בבקשות שלך ולעקוב אחר סטטוס הטיפול
+      </p>
+      <ng-template #employeeText>
+        <p>כאן ניתן לצפות בכלל הבקשות, לזהות חריגות ולהיכנס לטיפול</p>
+      </ng-template>
+    </div>
+
+    <div class="header-actions">
+     <app-role-switch (roleChanged)="onRoleChanged()"></app-role-switch>
+      <a routerLink="/requests/new" class="new-request-btn">הגשת בקשה חדשה</a>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>מספר בקשה</th>
+          <th>כותרת</th>
+          <th>יועץ</th>
+          <th>יחידה</th>
+          <th>תאריך הגשה</th>
+          <th>דחיפות</th>
+          <th>סטטוס בקשה
+          <th>SLA</th>
+          <th>ימים פתוחים</th>
+          <th>סטטוס טיפול</th>
+          <th>הערות</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let request of requests" [class.stuck-row]="isStuck(request.lastUpdatedAt)">
+          <td>{{ request.requestNumber }}</td>
+          <td>{{ request.title }}</td>
+          <td>{{ request.consultantName }}</td>
+          <td>{{ request.unit }}</td>
+          <td>{{ request.submittedAt }}</td>
+
+          <td>{{ request.urgency }}</td>
+          <td>
+            <app-status-badge [status]="request.status"></app-status-badge>
+          </td>
+          <td>
+            <app-sla-badge [state]="getSlaState(request.submittedAt)"></app-sla-badge>
+          </td>
+          <td>{{ getDaysOpen(request.submittedAt) }}</td>
+          <td>
+  <span *ngIf="isStuck(request.lastUpdatedAt)" class="warning-icon" aria-label="בקשה תקועה - לא עודכנה מעל 14 ימים" [title]="'בקשה תקועה - לא עודכנה מעל 14 ימים'">
+    ⚠️ תקוע
+  </span>
+</td>
+          <td>{{ request.reviewNote || '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

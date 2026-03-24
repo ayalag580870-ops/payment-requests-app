@@ -1,0 +1,15 @@
+<div class="role-switch">
+  <button
+    type="button"
+    [class.active]="currentRole === 'consultant'"
+    (click)="setRole('consultant')">
+    תצוגת יועץ
+  </button>
+
+  <button
+    type="button"
+    [class.active]="currentRole === 'employee'"
+    (click)="setRole('employee')">
+    תצוגת עובד ארגון
+  </button>
+</div>
