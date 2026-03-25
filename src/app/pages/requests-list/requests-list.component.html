@@ -1,5 +1,15 @@
 <section class="page">
   <div class="page-header">
+
+
+<a
+  *ngIf="currentRole === 'employee'"
+  routerLink="/dashboard"
+  class="dashboard-btn">
+  מעבר לדשבורד
+</a>
+
+
     <div>
       <h1>רשימת דרישות תשלום</h1>
       <p *ngIf="currentRole === 'consultant'; else employeeText">
@@ -12,7 +22,12 @@
 
     <div class="header-actions">
      <app-role-switch (roleChanged)="onRoleChanged()"></app-role-switch>
-      <a routerLink="/requests/new" class="new-request-btn">הגשת בקשה חדשה</a>
+   <a
+  *ngIf="currentRole === 'consultant'"
+  routerLink="/requests/new"
+  class="new-request-btn">
+  הגשת בקשה חדשה
+</a>
     </div>
   </div>
 
@@ -31,11 +46,12 @@
           <th>ימים פתוחים</th>
           <th>סטטוס טיפול</th>
           <th>הערות</th>
+          <th>פעולה</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let request of requests" [class.stuck-row]="isStuck(request.lastUpdatedAt)">
+        <tr *ngFor="let request of requests" [class.stuck-row]="isStuck(request.lastUpdatedAt, request.status)">
           <td>{{ request.requestNumber }}</td>
           <td>{{ request.title }}</td>
           <td>{{ request.consultantName }}</td>
@@ -51,11 +67,16 @@
           </td>
           <td>{{ getDaysOpen(request.submittedAt) }}</td>
           <td>
-  <span *ngIf="isStuck(request.lastUpdatedAt)" class="warning-icon" aria-label="בקשה תקועה - לא עודכנה מעל 14 ימים" [title]="'בקשה תקועה - לא עודכנה מעל 14 ימים'">
+  <span *ngIf="isStuck(request.lastUpdatedAt, request.status)" class="warning-icon" aria-label="בקשה תקועה - לא עודכנה מעל 14 ימים" [title]="'בקשה תקועה - לא עודכנה מעל 14 ימים'">
     ⚠️ תקוע
   </span>
 </td>
           <td>{{ request.reviewNote || '-' }}</td>
+
+<td>
+  <a [routerLink]="['/requests', request.id]" class="view-link">צפייה</a>
+</td>
+
         </tr>
       </tbody>
     </table>

@@ -35,8 +35,8 @@ export class RequestsListComponent implements OnInit {
     return this.paymentRequestsService.getSlaState(submittedAt);
   }
 
-  isStuck(lastUpdatedAt: string): boolean {
-    return this.paymentRequestsService.isStuck(lastUpdatedAt);
+  isStuck(lastUpdatedAt: string, status: string): boolean {
+    return this.paymentRequestsService.isStuck(lastUpdatedAt, status);
   }
 
   onRoleChanged(): void {

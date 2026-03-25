@@ -10,6 +10,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'requests', pathMatch: 'full' },
   { path: 'requests', component: RequestsListComponent },
   { path: 'requests/new', component: RequestFormComponent },
+  { path: 'requests/edit/:id', component: RequestFormComponent },
   { path: 'requests/:id', component: RequestDetailsComponent },
   { path: 'dashboard', component: DashboardComponent }
 ];

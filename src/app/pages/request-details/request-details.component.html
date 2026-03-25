@@ -1,1 +1,146 @@
-<p>request-details works!</p>
+<section class="page" *ngIf="request">
+  <div class="page-header">
+    <div>
+      <h1>{{ request.title }}</h1>
+      <p>מספר בקשה: {{ request.requestNumber }}</p>
+    </div>
+
+    <div class="header-badges">
+      <app-status-badge [status]="request.status"></app-status-badge>
+      <app-sla-badge [state]="getSlaState(request.submittedAt)"></app-sla-badge>
+      <span class="urgency-badge">{{ request.urgency }}</span>
+    </div>
+  </div>
+
+  <div class="details-layout">
+    <div class="details-card">
+      <h2>פרטי הבקשה</h2>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">יועץ</span>
+          <span>{{ request.consultantName }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">מזהה יועץ</span>
+          <span>{{ request.consultantId }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">יחידה</span>
+          <span>{{ request.unit }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">פרויקט</span>
+          <span>{{ request.project }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">סכום מבוקש</span>
+          <span>{{ request.amount | number }} ₪</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">תאריך ביצוע</span>
+          <span>{{ request.executionDate }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">תאריך הגשה</span>
+          <span>{{ request.submittedAt }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">ימים פתוחים</span>
+          <span>{{ getDaysOpen(request.submittedAt) }}</span>
+        </div>
+      </div>
+
+      <div class="description-box">
+        <span class="label">תיאור ביצוע</span>
+        <p>{{ request.description }}</p>
+      </div>
+    </div>
+
+    <div class="details-card">
+      <h2>קבצים והערות</h2>
+
+      <div class="attachments-box">
+        <span class="label">קבצים מצורפים</span>
+
+        <div *ngIf="request.attachments && request.attachments.length > 0; else noFiles">
+          <ul>
+            <li *ngFor="let file of request.attachments">
+              <a *ngIf="file.fileUrl && file.fileUrl.trim() !== ''; else fileNameOnly" [href]="file.fileUrl" download title="לחץ להורדה">
+                📎 {{ file.fileName }}
+              </a>
+              <ng-template #fileNameOnly>
+                <span title="קובץ שמור בארכיון">📎 {{ file.fileName }}</span>
+              </ng-template>
+            </li>
+          </ul>
+        </div>
+
+        <ng-template #noFiles>
+          <p class="muted">אין קבצים מצורפים</p>
+        </ng-template>
+      </div>
+
+      <div class="notes-box">
+        <span class="label">הערות</span>
+        <p>{{ request.reviewNote || '-' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="details-card action-card"
+    *ngIf="currentRole === 'employee' && request.status !== 'אושר לתשלום'">
+    <h2>פעולות טיפול</h2>
+
+    <div class="form-field">
+      <label for="reviewNote">הערת טיפול</label>
+      <textarea
+        id="reviewNote"
+        rows="4"
+        [(ngModel)]="reviewNote"
+        placeholder="ניתן להזין הסבר לאישור, דחייה או בקשת הבהרה"></textarea>
+    </div>
+
+    <div class="action-buttons">
+      <button type="button" class="approve-btn" (click)="approve()">אישור לתשלום</button>
+      <button type="button" class="clarification-btn" (click)="requestClarification()">בקשת הבהרה</button>
+      <button type="button" class="reject-btn" (click)="reject()">דחייה</button>
+      <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+    </div>
+  </div>
+
+  <div
+    class="details-card action-card"
+    *ngIf="currentRole === 'employee' && request.status === 'אושר לתשלום'">
+    <h2>סטטוס סופי</h2>
+    <p class="muted">
+      בקשה זו אושרה לתשלום ולא ניתן לעדכן את הסטטוס שלה.
+    </p>
+    <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+  </div>
+
+  <div class="details-card action-card" *ngIf="currentRole === 'consultant'">
+    <h2>פעולות</h2>
+    <div *ngIf="request.status === 'טיוטה'; else viewOnlyMode">
+      <p>בקשה זו עדיין בסטטוס טיוטה. ניתן לערוך אותה או להגישה לבדיקה.</p>
+      <div class="action-buttons">
+        <button type="button" class="primary-btn" (click)="editDraft()">עריכה</button>
+        <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+      </div>
+    </div>
+    <ng-template #viewOnlyMode>
+      <p class="muted">
+        בתצוגת יועץ ניתן לצפות בפרטי הבקשה ולעקוב אחר סטטוס הטיפול.
+      </p>
+      <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+    </ng-template>
+  </div>
+</section>

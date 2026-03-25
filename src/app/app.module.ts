@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,7 +13,6 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { RoleSwitchComponent } from './components/role-switch/role-switch.component';
 import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
 import { SlaBadgeComponent } from './components/sla-badge/sla-badge.component';
-import { EmptyStateComponent } from './components/empty-state/empty-state.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +24,12 @@ import { EmptyStateComponent } from './components/empty-state/empty-state.compon
     RoleSwitchComponent,
     StatusBadgeComponent,
     SlaBadgeComponent,
-    EmptyStateComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule, 
+    FormsModule,
+ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

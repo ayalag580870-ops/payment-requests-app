@@ -1,1 +1,154 @@
-<p>dashboard works!</p>
+<section class="page" *ngIf="currentRole === 'employee'; else consultantView">
+  <div class="page-header">
+    <div>
+      <h1>דשבורד בקרה</h1>
+      <p>מסך זה מרכז תמונת מצב של כלל דרישות התשלום ומדגיש חריגות SLA ובקשות תקועות.</p>
+    </div>
+
+    <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">כלל הבקשות</span>
+      <strong>{{ summary.totalRequests }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">בקשות פעילות</span>
+      <strong>{{ summary.activeRequests }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">בבדיקה</span>
+      <strong>{{ summary.inReviewCount }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">ממתין להבהרות</span>
+      <strong>{{ summary.waitingClarificationCount }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">אושרו לתשלום</span>
+      <strong>{{ summary.approvedCount }}</strong>
+    </div>
+
+    <div class="kpi-card danger-card">
+      <span class="kpi-label">חריגות SLA</span>
+      <strong>{{ summary.slaBreachedCount }}</strong>
+    </div>
+
+    <div class="kpi-card warning-card">
+      <span class="kpi-label">בקשות תקועות</span>
+      <strong>{{ summary.stuckCount }}</strong>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h2>התפלגות בקשות לפי סטטוס</h2>
+
+      <div class="chart-list">
+        <div class="chart-row" *ngFor="let item of statusChartData">
+          <div class="chart-meta">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar-fill status-bar"
+              [style.width]="getBarWidth(item.value, statusChartData)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h2>התפלגות SLA</h2>
+
+      <div class="chart-list">
+        <div class="chart-row" *ngFor="let item of slaChartData">
+          <div class="chart-meta">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar-fill"
+              [ngClass]="{
+                'sla-normal': item.label === 'תקין',
+                'sla-warning': item.label === 'אזהרה',
+                'sla-danger': item.label === 'חריגה'
+              }"
+              [style.width]="getBarWidth(item.value, slaChartData)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="section-header">
+      <h2>בקשות דורשות טיפול</h2>
+      <p>בקשות החורגות מ-SLA או בקשות שזוהו כתקועות.</p>
+    </div>
+
+    <table *ngIf="attentionRequests.length > 0; else noAttentionRequests">
+      <thead>
+        <tr>
+          <th>מספר בקשה</th>
+          <th>כותרת</th>
+          <th>סטטוס</th>
+          <th>SLA</th>
+          <th>ימים פתוחים</th>
+          <th>תקועה</th>
+          <th>פעולה</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let request of attentionRequests">
+          <td>{{ request.requestNumber }}</td>
+          <td>{{ request.title }}</td>
+          <td>
+            <app-status-badge [status]="request.status"></app-status-badge>
+          </td>
+          <td>
+            <app-sla-badge [state]="getSlaState(request.submittedAt)"></app-sla-badge>
+          </td>
+          <td>{{ getDaysOpen(request.submittedAt) }}</td>
+          <td>
+            <span class="stuck-pill" *ngIf="isStuck(request.lastUpdatedAt, request.status); else notStuck">
+              כן
+            </span>
+            <ng-template #notStuck>לא</ng-template>
+          </td>
+          <td>
+            <button type="button" class="link-btn" (click)="openRequest(request.id)">צפייה</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noAttentionRequests>
+      <p class="muted">אין כרגע בקשות חריגות או תקועות.</p>
+    </ng-template>
+  </div>
+</section>
+
+<ng-template #consultantView>
+  <section class="page">
+    <div class="table-card">
+      <h1>דשבורד בקרה</h1>
+      <p class="muted">
+        מסך זה מיועד לעובדי הארגון לצורך בקרה וניהול תהליך הטיפול בדרישות תשלום.
+      </p>
+      <button type="button" class="secondary-btn" (click)="goBack()">חזרה לרשימה</button>
+    </div>
+  </section>
+</ng-template>

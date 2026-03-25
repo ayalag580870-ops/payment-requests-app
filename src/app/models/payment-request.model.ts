@@ -2,6 +2,11 @@ import { RequestStatus } from './request-status.type';
 
 export type UrgencyLevel = 'נמוכה' | 'בינונית' | 'גבוהה';
 
+export interface RequestAttachment {
+  fileName: string;
+  fileUrl: string;
+}
+
 export interface PaymentRequest {
   id: number;
   requestNumber: string;
@@ -18,5 +23,5 @@ export interface PaymentRequest {
   status: RequestStatus;
   lastUpdatedAt: string;
   reviewNote?: string;
-  attachments: string[];
+  attachments: RequestAttachment[];
 }

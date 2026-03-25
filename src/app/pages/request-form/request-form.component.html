@@ -1,1 +1,137 @@
-<p>request-form works!!!!!!</p>
+<section class="page">
+  <div class="page-header">
+    <h1 *ngIf="editingRequestId; else newRequest">עריכת טיוטה</h1>
+    <ng-template #newRequest>
+      <h1>הגשת דרישת תשלום חדשה</h1>
+    </ng-template>
+    <p *ngIf="editingRequestId; else newRequestDesc">עדכן את פרטי הטיוטה שלך</p>
+    <ng-template #newRequestDesc>
+      <p>יש למלא את פרטי הבקשה ולצרף מסמכים רלוונטיים לצורך טיפול</p>
+    </ng-template>
+  </div>
+
+  <form [formGroup]="requestForm" class="form-card">
+    <div class="form-section">
+      <h2>פרטי הבקשה</h2>
+
+      <div class="form-field">
+        <label for="title">כותרת הבקשה</label>
+        <input id="title" type="text" formControlName="title" />
+        <small class="error" *ngIf="title?.touched && title?.invalid">
+          יש למלא כותרת בקשה
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label for="description">תיאור ביצוע</label>
+        <textarea id="description" rows="4" formControlName="description"></textarea>
+        <small class="error" *ngIf="description?.touched && description?.invalid">
+          יש למלא תיאור ביצוע
+        </small>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="amount">סכום מבוקש</label>
+          <input id="amount" type="number" formControlName="amount" />
+          <small class="error" *ngIf="amount?.touched && amount?.invalid">
+            יש להזין סכום תקין
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="executionDate">תאריך ביצוע</label>
+          <input id="executionDate" type="date" formControlName="executionDate" [max]="maxDate" />
+          <small class="error" *ngIf="executionDate?.touched && executionDate?.hasError('required')">
+            יש לבחור תאריך ביצוע
+          </small>
+          <small class="error" *ngIf="executionDate?.touched && executionDate?.hasError('futureDate')">
+            לא ניתן לבחור תאריך עתידי
+          </small>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="urgency">דחיפות</label>
+        <select id="urgency" formControlName="urgency">
+          <option value="">בחרי דחיפות</option>
+          <option *ngFor="let urgencyOption of urgencies" [value]="urgencyOption">
+            {{ urgencyOption }}
+          </option>
+        </select>
+        <small class="error" *ngIf="urgency?.touched && urgency?.invalid">
+          יש לבחור דחיפות
+        </small>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>שיוך ארגוני</h2>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="unit">יחידה</label>
+          <select id="unit" formControlName="unit">
+            <option value="">בחרי יחידה</option>
+            <option *ngFor="let unitOption of units" [value]="unitOption">
+              {{ unitOption }}
+            </option>
+          </select>
+          <small class="error" *ngIf="unit?.touched && unit?.invalid">
+            יש לבחור יחידה
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="project">פרויקט</label>
+          <select id="project" formControlName="project">
+            <option value="">בחרי פרויקט</option>
+            <option *ngFor="let projectOption of projects" [value]="projectOption">
+              {{ projectOption }}
+            </option>
+          </select>
+          <small class="error" *ngIf="project?.touched && project?.invalid">
+            יש לבחור פרויקט
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>מסמכים והערות</h2>
+
+      <div class="form-field">
+        <label for="attachments">העלאת קבצים</label>
+        <input id="attachments" type="file" multiple (change)="onFileSelected($event)" />
+      </div>
+
+      <div class="selected-files" *ngIf="selectedFiles.length > 0">
+  <p>קבצים שנבחרו:</p>
+  <ul>
+    <li *ngFor="let file of selectedFiles">
+      <a [href]="file.fileUrl" download>
+        📎 {{ file.fileName }}
+      </a>
+    </li>
+  </ul>
+</div>
+
+      <div class="form-field">
+        <label for="notes">הערות</label>
+        <textarea id="notes" rows="3" formControlName="notes"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="secondary-btn" (click)="cancel()">ביטול</button>
+      <button type="button" class="draft-btn" (click)="saveAsDraft()">
+        <span *ngIf="editingRequestId; else newDraftText">עדכן טיוטה</span>
+        <ng-template #newDraftText>שמור כטיוטה</ng-template>
+      </button>
+      <button type="button" class="primary-btn" (click)="submitForReview()">
+        <span *ngIf="editingRequestId; else newReviewText">שלח לבדיקה</span>
+        <ng-template #newReviewText>שלח לבדיקה</ng-template>
+      </button>
+    </div>
+  </form>
+</section>
